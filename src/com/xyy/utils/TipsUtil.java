@@ -29,4 +29,26 @@ public class TipsUtil {
             Log.e(tag, msg);
         }
     }
+    
+    //根据类型参数创建(泛型)对应对象，如在class A<B>，即类A中创建B对象
+    public static <T> T createObj(Object obj, int i) {
+        // class ClassName<T,K,V>
+        Type superType = obj.getClass().getGenericSuperclass();
+        if (superType instanceof ParameterizedType) {
+            ParameterizedType pType = (ParameterizedType) superType;
+            //遍历尖括号中的类型
+            Type[] ts = pType.getActualTypeArguments();
+            Class<T> cls = (Class<T>) ts[i];
+            try {
+                return cls.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+    
+   
 }
