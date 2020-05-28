@@ -9,14 +9,33 @@ import android.widget.Toast;
  */
 public class TipsUtil {
     private static final boolean DEBUG = true;
+private static Toast toast = null;
+    private static WeakReference<Context> contextRef;
 
-
-    public static void showToast(Context context, String msg) {
-        showToast(context, msg, Toast.LENGTH_SHORT);
+    public static void toast(Context context, int res){
+        toast(context,res,Toast.LENGTH_SHORT);
+    }
+    public static void toast(Context context, int res,int duration) {
+        toast(context, context.getResources().getString(res),duration);
     }
 
-    public static void showToast(Context context, String msg, int time) {
-        Toast.makeText(context, msg, time).show();
+    public static void toast(Context context, String msg) {
+        toast(context, msg, Toast.LENGTH_SHORT);
+    }
+
+    public static void toast(Context context, String msg, int duration) {
+        //é˜²æ­¢å¤šæ¬¡æ˜¾ç¤ºToastæ˜¯é¢‘ç¹å¼¹å‡ºæç¤ºæ¡†
+        if (null == toast) {
+            if (null == contextRef || contextRef.get() == null) {
+                contextRef = new WeakReference<>(context.getApplicationContext());
+            }
+            //ä½¿ç”¨ApplicationContexté˜²æ­¢å†…å­˜æ³„æ¼
+            toast = Toast.makeText(contextRef.get(), msg, duration);
+        } else {
+            toast.setDuration(duration);
+            toast.setText(msg);
+        }
+        toast.show();
     }
 
 
@@ -30,13 +49,13 @@ public class TipsUtil {
         }
     }
     
-    //¸ù¾İÀàĞÍ²ÎÊı´´½¨(·ºĞÍ)¶ÔÓ¦¶ÔÏó£¬ÈçÔÚclass A<B>£¬¼´ÀàAÖĞ´´½¨B¶ÔÏó
+    //æ ¹æ®ç±»å‹å‚æ•°åˆ›å»º(æ³›å‹)å¯¹åº”å¯¹è±¡ï¼Œå¦‚åœ¨class A<B>ï¼Œå³ç±»Aä¸­åˆ›å»ºBå¯¹è±¡
     public static <T> T createObj(Object obj, int i) {
         // class ClassName<T,K,V>
         Type superType = obj.getClass().getGenericSuperclass();
         if (superType instanceof ParameterizedType) {
             ParameterizedType pType = (ParameterizedType) superType;
-            //±éÀú¼âÀ¨ºÅÖĞµÄÀàĞÍ
+            //éå†å°–æ‹¬å·ä¸­çš„ç±»å‹
             Type[] ts = pType.getActualTypeArguments();
             Class<T> cls = (Class<T>) ts[i];
             try {
